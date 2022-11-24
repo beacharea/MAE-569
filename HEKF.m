@@ -73,7 +73,7 @@ pretty(J)
 Jlatex = latex(J);
 
 
-%% (c)
+%% step 1
 % initialize the filter
 xA_a_0 = randn(6,1);%[-1.25, 0.1, 1.75, -0.2, 3, 0.5]';
 PA_a_0 = eye(6);
@@ -89,9 +89,9 @@ Q = 2.5e-4*eye(6);
 L = eye(6);
 M = eye(4);
 
-%% Kalman Filter
+%% step 2
 dt = t_measure(2) - t_measure(1);
-% initialization
+% preallocation
 xA_f_vec = zeros(6,length(t_measure));
 xA_a_vec = zeros(6,length(t_measure));
 
@@ -99,8 +99,9 @@ PA_a_km1 = PA_a_0;
 xA_a_km1 = xA_a_0;
 Z = [];
 
+%% step 3
 for k = 1:length(t_measure)
-    % (a)
+    % step 3-1
     p_entries = P2entries(PA_a_km1);
     zIC = [xA_a_km1; p_entries];
     tspanode = [t_measure(k)-dt, t_measure(k)-dt/2, t_measure(k)];
@@ -110,7 +111,7 @@ for k = 1:length(t_measure)
     xA_f_vec(:,k) = xA_f_k;
     PA_f_k = entries2P(z_f_k(7:27,1));
     
-    % (b)
+    % step 3-2
     K_k = PA_f_k*H.'/(H*PA_f_k*H.' + M*R*M.'); % Kalman gain
     xA_a_k = xA_f_k + K_k*(y(:,k) - H*xA_f_k); % x(t|t) <- x(t|t-1)
     xA_a_vec(:,k) = xA_a_k;
